@@ -4,6 +4,13 @@ Spring Boot backend of the JHipster sample application (bank accounts, labels an
 
 It is an API server only: it no longer builds, packages or serves the Angular application. The Angular application lives in a separate repository, [jhipster-sample-app-frontend](https://github.com/Ak47EveryDay/jhipster-sample-app-frontend).
 
+## Documentation (Japanese)
+
+Design documents and development guidelines, written in Japanese and based on this repository's code, are in [docs/](docs/README.md):
+
+- [docs/050_内部設計](docs/050_内部設計/README.md): internal design — architecture, common specifications, per-function processing and REST interfaces, tables, repositories, database migrations
+- [docs/999_標準化](docs/999_標準化/README.md): standards and system knowledge — layering, common components, coding conventions, development procedures, tests, configuration and build
+
 ## Requirements
 
 - Java 21
