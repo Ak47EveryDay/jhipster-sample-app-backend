@@ -338,7 +338,7 @@ ID の指定と存在をチェックする。
 
 ステータス 204、応答本文なし。ヘッダ `X-jhipsterSampleApplicationApp-alert: label.deleted`、`X-jhipsterSampleApplicationApp-params: {id}` を返す。
 
-取引が紐付いているラベルを削除しようとすると、外部キー制約 `fk_rel_operation__label__label_id` に反するため、コードからの導出では 500 となる。
+取引が紐付いているラベルを削除しようとすると、外部キー制約 `fk_rel_operation__label__label_id` に反するため 500 となる（動作確認済み。2026/11/24）。
 
 ---
 
@@ -362,6 +362,6 @@ ID の指定と存在をチェックする。
 | 6 | PUT、PATCH | `/api/labels` に `id` を付けずに呼び出した | 405 | `problem-with-message` | `error.http.405` | `LabelResourceIT#putWithMissingIdPathParamLabel`、`patchWithMissingIdPathParamLabel` |
 | 7 | GET（一件） | `id` に該当するラベルがない | 404 | `problem-with-message` | `error.http.404` | `LabelResourceIT#getNonExistingLabel` |
 | 8 | 全エンドポイント | 未認証、または JWT が無効 | 401 | － | 本文なし | コード（`SecurityConfiguration`） |
-| 9 | DELETE | 取引が紐付いているラベルを削除した | 500 | `problem-with-message` | `error.http.500` | コードからの導出（外部キー制約） |
+| 9 | DELETE | 取引が紐付いているラベルを削除した | 500 | `problem-with-message` | `error.http.500` | 動作確認（2026/11/24。`DataIntegrityViolationException`）。ラベルは削除されない |
 
 ---

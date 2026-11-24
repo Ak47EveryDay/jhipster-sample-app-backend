@@ -348,7 +348,7 @@ ID の指定と存在をチェックする。
 
 ステータス 204、応答本文なし。ヘッダ `X-jhipsterSampleApplicationApp-alert: bankAccount.deleted`、`X-jhipsterSampleApplicationApp-params: {id}` を返す。
 
-取引（`operation`）が紐付いている口座を削除しようとすると、外部キー制約 `fk_operation__bank_account_id` に反するため、コードからの導出では 500 となる。
+取引（`operation`）が紐付いている口座を削除しようとすると、外部キー制約 `fk_operation__bank_account_id` に反するため 500 となる（動作確認済み。2026/11/24）。
 
 ---
 
@@ -372,6 +372,6 @@ ID の指定と存在をチェックする。
 | 6 | PUT、PATCH | `/api/bank-accounts` に `id` を付けずに呼び出した | 405 | `problem-with-message` | `error.http.405` | `BankAccountResourceIT#putWithMissingIdPathParamBankAccount`、`patchWithMissingIdPathParamBankAccount` |
 | 7 | GET（一件） | `id` に該当する口座がない | 404 | `problem-with-message` | `error.http.404` | `BankAccountResourceIT#getNonExistingBankAccount` |
 | 8 | 全エンドポイント | 未認証、または JWT が無効 | 401 | － | 本文なし | コード（`SecurityConfiguration`） |
-| 9 | DELETE | 取引が紐付いている口座を削除した | 500 | `problem-with-message` | `error.http.500` | コードからの導出（外部キー制約） |
+| 9 | DELETE | 取引が紐付いている口座を削除した | 500 | `problem-with-message` | `error.http.500` | 動作確認（2026/11/24。`DataIntegrityViolationException`）。口座は削除されない |
 
 ---

@@ -165,7 +165,7 @@ URL による認可以外に、リソースクラスのメソッド単位で権�
 | 2 | あり、`activated` が false | `UserNotActivatedException` をスローする |
 | 3 | あり、`activated` が true | `UserWithId.fromUser(user)` を返す |
 
-パスワードが一致しない場合は `BadCredentialsException` となる。ユーザが存在しない場合とパスワードが一致しない場合を、応答上は区別しない。
+パスワードが一致しない場合は `BadCredentialsException` となる。ユーザが存在しない場合とパスワードが一致しない場合は、どちらも 401 で `message`（`error.http.401`）も同じであるが、応答の `detail` は異なる（ユーザが存在しない場合は `User <ログインID> was not found in the database`、パスワードが一致しない場合は `Bad credentials`）。そのため、ログイン ID が登録済みかどうかを応答から判別できる。詳細は「サービス詳細設計書_ログイン認証」を参照。
 
 ---
 

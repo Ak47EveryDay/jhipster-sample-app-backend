@@ -268,7 +268,7 @@ flowchart TD
 
 ステータス 204、応答本文なし。ヘッダ `X-jhipsterSampleApplicationApp-alert: adminAuthority.deleted`、`X-jhipsterSampleApplicationApp-params: {id}` を返す。
 
-存在しない権限名を指定した場合も 204 となる。ユーザに付与されている権限を削除しようとすると、外部キー制約 `fk_authority_name`（`jhi_user_authority.authority_name`）に反するため、コードからの導出では 500 となる。
+存在しない権限名を指定した場合も 204 となる。ユーザに付与されている権限を削除しようとすると、外部キー制約 `fk_authority_name`（`jhi_user_authority.authority_name`）に反するため 500 となる（動作確認済み。2026/11/24）。
 
 ---
 
@@ -288,8 +288,8 @@ flowchart TD
 | 2 | POST | 同じ権限名が既に存在 | 400 | `problem-with-message` | `error.idexists` | `AuthorityResourceIT#createAuthorityWithExistingId` |
 | 3 | GET（一件） | 指定した権限が存在しない | 404 | `problem-with-message` | `error.http.404` | `AuthorityResourceIT#getNonExistingAuthority` |
 | 4 | 全エンドポイント | 未認証、または JWT が無効 | 401 | － | 本文なし | コード（`SecurityConfiguration`） |
-| 5 | 全エンドポイント | `ROLE_ADMIN` 以外の認証済みユーザ | 403 | `problem-with-message` | `error.http.403` | コード（`@PreAuthorize`）。同種の変換は `ExceptionTranslatorIT#testAccessDenied` が確認 |
-| 6 | DELETE | ユーザに付与されている権限を削除 | 500 | `problem-with-message` | `error.http.500` | コードからの導出（外部キー制約） |
+| 5 | 全エンドポイント | `ROLE_ADMIN` 以外の認証済みユーザ | 403 | `problem-with-message` | `error.http.403` | 動作確認（2026/11/24。`detail` は `Access Denied`）。根拠となるコードは `@PreAuthorize`。同種の変換は `ExceptionTranslatorIT#testAccessDenied` が確認 |
+| 6 | DELETE | ユーザに付与されている権限を削除 | 500 | `problem-with-message` | `error.http.500` | 動作確認（2026/11/24。`DataIntegrityViolationException`）。権限は削除されない |
 
 No 5 は、URL `/api/authorities` が `SecurityConfiguration` 上は「認証済み」で許可されているため、メソッドセキュリティの `@PreAuthorize` が拒否するものである。
 

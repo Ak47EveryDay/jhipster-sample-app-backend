@@ -207,6 +207,7 @@
 | テストのメソッド名 | 本リポジトリの統合テストが、そのステータスや応答を確認している |
 | コード（～） | コードの記述から直接読み取れる（アノテーション、設定値、分岐など） |
 | コードからの導出（～） | コードの規則をたどって導いた結論。HTTP レベルで確認するテストはない |
+| 動作確認（2026/11/24） | 開発用の設定（`dev`、H2 のインメモリ DB）でアプリケーションを起動し、HTTP リクエストを送って確認した。自動テストとしては残していない |
 
 ---
 
@@ -217,9 +218,9 @@
 | No | 項目 | 内容 | 記載箇所 |
 | --- | --- | --- | --- |
 | 1 | パス変数の形式チェック | `UserResource` のパス変数 `login` に `@Pattern` を付与しているが、クラスに `@Validated` がない。チェックがフレームワークのメソッドバリデーションで実際に実行されるかは未確認 | サービス詳細設計書_ユーザ管理 |
-| 2 | 未有効化ユーザのログイン | `UserNotActivatedException` は 500 になる（コードからの導出）。HTTP レベルで確認するテストはない | サービス詳細設計書_ログイン認証、例外処理設計書 |
-| 3 | 権限不足の応答 | `AuthorityResource` で `ROLE_ADMIN` 以外のユーザが呼び出した場合は 403 の Problem Details になる（コードからの導出） | サービス詳細設計書_権限管理 |
-| 4 | 外部キー制約に反する削除 | 参照されている権限、口座、ラベルの削除は 500 になる（コードからの導出） | 各サービス詳細設計書 |
+| 2 | 未有効化ユーザのログイン | 500 になることは動作確認した。`ExceptionTranslator` が受け取るのは、Spring Security が `UserNotActivatedException` を包んだ `InternalAuthenticationServiceException` である。HTTP レベルで確認する自動テストはない | サービス詳細設計書_ログイン認証、例外処理設計書 |
+| 3 | 権限不足の応答 | `AuthorityResource` を `ROLE_ADMIN` 以外のユーザが呼び出した場合は 403 の Problem Details になる（動作確認済み。`message` は `error.http.403`、`detail` は `Access Denied`） | サービス詳細設計書_権限管理 |
+| 4 | 外部キー制約に反する削除 | 参照されている権限、口座、ラベルの削除は 500 になる（動作確認済み。`DataIntegrityViolationException` となり、`message` は `error.http.500`、データは削除されない） | 各サービス詳細設計書 |
 | 5 | 公開ユーザ情報検索の認可 | クラスのコメントは「誰でも呼び出せる」と記すが、`SecurityConfiguration` では認証済みが必要 | サービス詳細設計書_公開ユーザ情報検索、セキュリティ設計書 |
 | 6 | 未使用の定義 | 主コードからの呼び出し元がないもの：`UserMapper`、`UserService#getAuthorities`、`BankAccountRepository#findByUserIsCurrentUser`、`SecurityMetersService#trackTokenUnsupported`、`MailService#sendEmail`、設定 `jhipster.http.cache.timeToLiveInDays` | 各設計書 |
 | 7 | ライブラリの挙動 | JHipster ライブラリ（`HeaderUtil`、`PaginationUtil`、`ResponseUtil`、`RandomUtil`、`PrefixedKeyGenerator`、`SpringLiquibaseUtil`）と Spring Security（401 と 403 の処理クラス）の挙動は、依存関係の JAR ファイルを確認して記載した。その他のライブラリのクラスは、本リポジトリでの使われ方だけを記載した | 共通Utilクラス、セキュリティ設計書など |

@@ -185,10 +185,10 @@ flowchart TD
 | 1 | `login` がメールアドレス形式（`EmailValidator#isValid` が true） | `UserRepository#findOneWithAuthoritiesByEmailIgnoreCase(login)` で検索する | － |
 | 2 | 上記以外 | `login` を `toLowerCase(Locale.ENGLISH)` で小文字化し、`UserRepository#findOneWithAuthoritiesByLogin` で検索する | － |
 | 3 | 検索結果が 0 件 | `UsernameNotFoundException` をスローする。Spring Security はこれを `BadCredentialsException` として呼び出し元に伝える | 401 |
-| 4 | 検索結果あり、`activated` が false | `UserNotActivatedException` をスローする | 500 |
+| 4 | 検索結果あり、`activated` が false | `UserNotActivatedException` をスローする。Spring Security はこれを `InternalAuthenticationServiceException` として呼び出し元に伝え、`ExceptionTranslator` はそれを 500 に変換する | 500 |
 | 5 | 検索結果あり、`activated` が true | `UserWithId.fromUser(user)` を返す | 認証プリンシパルとなる |
 
-ユーザが存在しない場合とパスワードが一致しない場合を、応答上は区別しない。どちらも `BadCredentialsException` となり 401 を返す。ユーザが存在しない場合は `AuthenticateControllerIT#testAuthorizeFails` が確認している。パスワードが一致しない場合は HTTP レベルで確認するテストがなく、コードからの導出である。
+ユーザが存在しない場合とパスワードが一致しない場合は、どちらも 401 で `type`、`title`、`message`（`error.http.401`）も同じである。ただし `detail` は異なる。ユーザが存在しない場合は `User <ログインID> was not found in the database` となり、パスワードが一致しない場合は `Bad credentials` となる。すなわち、ログイン ID が登録済みかどうかを、応答の `detail` から判別できる。ユーザが存在しない場合は `AuthenticateControllerIT#testAuthorizeFails` が確認しており、パスワードが一致しない場合と `detail` の違いは動作確認した（2026/11/24、開発用の設定）。
 
 `UserWithId` は Spring Security の `User` のサブクラスであり（`DomainUserDetailsService` の static ネストクラス）、次の値を持つ。
 
@@ -285,8 +285,8 @@ flowchart TD
 | No | HTTPメソッド | 発生条件 | ステータス | `type` | `message` | 根拠 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | POST | `LoginVM` の単項目チェックエラー | 400 | `constraint-violation` | `error.validation`（`fieldErrors` 付き） | コード（`@Valid`） |
-| 2 | POST | ユーザが存在しない、またはパスワード不一致 | 401 | `problem-with-message` | `error.http.401` | `AuthenticateControllerIT#testAuthorizeFails`（ユーザが存在しない場合）。パスワード不一致の場合はコードからの導出（Spring Security が `BadCredentialsException` をスローする） |
-| 3 | POST | 未有効化のユーザ | 500 | `problem-with-message` | `error.http.500` | コードからの導出（`ExceptionTranslator` に `UserNotActivatedException` の対応はない） |
+| 2 | POST | ユーザが存在しない（`detail` は `User <ログインID> was not found in the database`）、またはパスワード不一致（`detail` は `Bad credentials`） | 401 | `problem-with-message` | `error.http.401` | ユーザが存在しない場合は `AuthenticateControllerIT#testAuthorizeFails`。パスワード不一致の場合と `detail` の内容は動作確認（2026/11/24） |
+| 3 | POST | 未有効化のユーザ | 500 | `problem-with-message` | `error.http.500` | 動作確認（2026/11/24）。`ExceptionTranslator` は、`UserNotActivatedException` を包んだ `InternalAuthenticationServiceException` を受け取り、ステータスを対応付ける規則がないため 500 とする |
 | 4 | GET | 未認証、または JWT が無効 | 401 | － | 本文なし | `AccountResourceIT#testNonAuthenticatedUser`、`TokenAuthenticationIT` |
 
 ---

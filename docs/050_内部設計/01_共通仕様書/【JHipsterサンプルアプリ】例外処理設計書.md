@@ -214,10 +214,10 @@ Spring MVC 標準の例外（ハンドラが親クラスにあるもの）は、
 | 11 | `ResponseStatusException` | `ResponseUtil#wrapOrNotFound`（検索結果なし） | 404 | `problem-with-message` | `error.http.404` | － | － |
 | 12 | `ConcurrencyFailureException` | データアクセス | 409 | `problem-with-message` | `error.concurrencyFailure` | － | － |
 | 13 | Spring MVC 標準の例外（サポートしない HTTP メソッド、必須パラメータの欠落等） | Spring MVC | Spring MVC が決定（405、400 等） | `problem-with-message` | `error.http.{status}` | － | － |
-| 14 | `UserNotActivatedException` | ログイン認証（`DomainUserDetailsService`） | 500 | `problem-with-message` | `error.http.500` | － | － |
+| 14 | `InternalAuthenticationServiceException`（原因は `security.UserNotActivatedException`） | ログイン認証（`DomainUserDetailsService` が `UserNotActivatedException` をスローし、Spring Security が包む） | 500 | `problem-with-message` | `error.http.500` | － | － |
 | 15 | 上記以外の例外 | － | 500 | `problem-with-message` | `error.http.500` | － | － |
 
-No 14 はコードからの導出である（`UserNotActivatedException` にはステータスを対応付ける規則がなく、`@ResponseStatus` も付いていないため、No 15 の規則で 500 となる）。HTTP レベルでこれを確認するテストはない。
+No 14 は動作確認済みである（2026/11/24、開発用の設定）。`UserNotActivatedException` には `@ResponseStatus` が付いておらず、それを包む `InternalAuthenticationServiceException` にもステータスを対応付ける規則がないため、No 15 の規則で 500 となる。応答の `detail` には `User <ログインID> was not activated` が入る。HTTP レベルでこれを確認する自動テストはない。
 
 各例外の発生条件は、各機能の「サービス詳細設計書」のエラー一覧を参照。
 
