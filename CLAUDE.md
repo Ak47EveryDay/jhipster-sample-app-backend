@@ -2,19 +2,16 @@
 <!-- 本文件由 ginga 平台的 AI 分析生成，重新分析时会自动更新；不想被自动更新请删除上面这行标记 -->
 # プロジェクトナレッジ（ginga AI 分析生成）
 
-**jhipster-sample-app-backend** は、JHipster 9.4.0 で生成したサンプルアプリケーション（銀行口座・ラベル・取引の管理）をバックエンドとして切り出した、REST API 専用の Spring Boot アプリケーションである。フロントエンド（Angular）は別リポジトリ `jhipster-sample-app-frontend` が担う。
+jhipster-sample-app-backend は、JHipster 9.4.0 生成のサンプルアプリケーション（銀行口座・ラベル・取引を扱う）から切り出した Spring Boot 4.1.1／Java 21 の REST API サーバーである（README.md）。
 
-- 技術スタック：Java 21、Spring Boot 4.1.1、Spring Data JPA（H2 / PostgreSQL）、Liquibase、Ehcache、Spring Security + JWT（HS512）、`jhipster-framework` 9.4.0（`pom.xml`、`README.md`）
-- 起動クラスは `JhipsterSampleApplicationApp`、ベースパッケージは `io.github.jhipster.sample`（`src/main/java/io/github/jhipster/sample/JhipsterSampleApplicationApp.java`）
-- 画面・静的ファイルの配信は行わず、API パス以外は拒否される（`README.md`、テストの `ApiOnlyIT`）
-- dev プロファイルはインメモリ H2、prod は PostgreSQL。ビルドは Maven wrapper（`./mvnw`）、CI は `./mvnw -Pprod verify`（`.github/workflows/github-actions.yml`）
-- 日本語の設計書・規約文書が `docs/050_内部設計/` と `docs/999_標準化/` に整備されており、実装・テスト・規約の一次情報となっている（`docs/README.md`）
-- テストは単体（surefire）、統合（failsafe、`*IT*`）、負荷試験（Gatling）に分かれ、統合テストは Testcontainers の PostgreSQL で実行する（`docs/999_標準化/テスト作成ガイド.md`）
+- 画面は持たず API のみ。Angular フロントエンドは別リポジトリ jhipster-sample-app-frontend が担う（README.md）。
+- レイヤーは web.rest → service → repository → domain の構成で、依存方向は ArchUnit テスト TechnicalStructureTest で検証されている（docs/999_標準化/レイヤー別開発ガイド.md）。
+- 認証は JWT（HS512）＋ Spring Security のステートレス構成。dev はインメモリ H2、prod は PostgreSQL、スキーマは Liquibase で管理する（docs/999_標準化/システム知識整理.md）。
+- キャッシュは Ehcache 3（JCache）でプロセス内に保持し、Hibernate 第 2 レベルキャッシュにも共用する（docs/03_詳細設計/01_共通仕様書/【JHipsterサンプルアプリ】キャッシュ設計書.md）。
+- ビルドは Maven（./mvnw）。単体テストと統合テストは ./mvnw verify、CI は -Pprod verify で Testcontainers の PostgreSQL 上で統合テストを実行する（.github/workflows/github-actions.yml）。
+- 日本語の詳細設計書を docs/03_詳細設計/ 配下に、規約・システム知識を docs/999_標準化/ 配下に整備している（docs/README.md、docs/999_標準化/README.md）。
 
 ## ナレッジ索引
 
 - [ナレッジの全ファイル一覧（毎分析で更新）](.ginga/knowledge/INDEX.md)
 - [システムナレッジ](.ginga/knowledge/system/)：レイヤー構成・エントリポイント・契約・共通部品
-- [開発ナレッジ](.ginga/knowledge/development/)：言語・フレームワーク・ビルドとエンジニアリング慣習
-- [テストナレッジ](.ginga/knowledge/testing/)：テストフレームワーク・構成・手法
-- [プロジェクト規約](.ginga/knowledge/standards/)：命名・コメント・コミットとブランチ規約
